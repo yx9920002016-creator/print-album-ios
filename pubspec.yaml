@@ -1,0 +1,65 @@
+name: print_album
+description: 排版印相 - 手机照片排版打印工具，自由排版照片制作实体相册
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.41.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 图片选择器 - 访问 iOS 相册
+  image_picker: ^1.1.2
+
+  # 照片库访问 - 批量读取相册照片
+  photo_manager: ^3.1.2
+
+  # 图片缓存（使用 photo_manager 自带的缓存机制）
+
+
+
+
+
+
+
+  # 路径管理
+  path_provider: ^2.1.3
+
+  # 本地存储
+  shared_preferences: ^2.2.3
+
+  # PDF 生成
+  pdf: ^3.11.1
+  printing: ^5.13.1
+
+  # 文件分享
+  share_plus: ^9.0.0
+
+  # UUID 生成
+  uuid: ^4.4.0
+
+  # 状态管理
+  provider: ^6.1.2
+
+  # 权限管理
+  permission_handler: ^11.3.1
+
+  # 图片处理
+  image: ^4.2.0
+
+  # intl 国际化
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/

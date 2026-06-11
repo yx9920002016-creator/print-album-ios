@@ -1,0 +1,35 @@
+{
+    "name": "排版印相",
+    "short_name": "排版印相",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FF7EB3",
+    "theme_color": "#FF7EB3",
+    "description": "排版印相 - 手机照片排版打印工具，自由排版照片制作实体相册",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
