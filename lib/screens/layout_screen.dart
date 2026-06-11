@@ -112,6 +112,8 @@ class _LayoutScreenState extends State<LayoutScreen> {
             ),
           ),
           // 操作按钮
+          _headerIcon(Icons.undo_rounded, '撤销', false, state.canUndo ? () => state.undo() : () {}, enabled: state.canUndo),
+          _headerIcon(Icons.redo_rounded, '重做', false, state.canRedo ? () => state.redo() : () {}, enabled: state.canRedo),
           _headerIcon(Icons.grid_view_rounded, '网格', state.showGrid, () => state.toggleGrid()),
           _buildThemePopup(state),
           _headerIcon(Icons.add_circle_rounded, '加页', false, () => state.addPage()),
@@ -123,12 +125,15 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  Widget _headerIcon(IconData icon, String tooltip, bool active, VoidCallback onTap) {
+  Widget _headerIcon(IconData icon, String tooltip, bool active, VoidCallback onTap, {bool enabled = true}) {
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
-        onTap: onTap,
-        child: Container(
+        onTap: enabled ? onTap : null,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: enabled ? 1.0 : 0.4,
+          child: Container(
           margin: EdgeInsets.symmetric(horizontal: context.rw(3)),
           padding: EdgeInsets.all(context.rw(8)),
           decoration: BoxDecoration(
@@ -136,6 +141,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
             borderRadius: BorderRadius.circular(context.rw(12)),
           ),
           child: Icon(icon, size: context.rw(20), color: active ? AppTheme.primaryColor : Colors.white),
+          ),
         ),
       ),
     );
@@ -302,6 +308,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
             scale: element.scale, rotation: element.rotation,
             x: element.x, y: element.y,
           );
+          state.saveUndoSnapshot();
         },
         onScaleUpdate: (details) {
           final start = _gestureStarts[element.id];
@@ -480,6 +487,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
             scale: text.scale, rotation: text.rotation,
             x: text.x, y: text.y,
           );
+          state.saveUndoSnapshot();
         },
         onScaleUpdate: (details) {
           final start = _gestureStarts[text.id];

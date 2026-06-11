@@ -6,6 +6,7 @@ import '../models/layout_page.dart';
 import '../services/photo_service.dart';
 import '../services/project_service.dart';
 import '../services/export_service.dart';
+import '../services/undo_manager.dart';
 import '../theme/app_theme.dart';
 
 class AppState extends ChangeNotifier {
@@ -47,6 +48,47 @@ class AppState extends ChangeNotifier {
   bool get showGrid => _showGrid;
   AlbumTheme get currentTheme => AppTheme.albumThemes[_currentThemeIndex];
   ExportService get exportService => _exportService;
+
+  // ===== 撤销/重做 =====
+  final UndoManager _undoManager = UndoManager();
+  bool get canUndo => currentPage != null && _undoManager.canUndo(currentPage!.id);
+  bool get canRedo => currentPage != null && _undoManager.canRedo(currentPage!.id);
+
+  /// 手动保存快照（连续手势操作前由 LayoutScreen 调用）
+  void saveUndoSnapshot() {
+    final page = currentPage;
+    if (page != null) _undoManager.saveSnapshot(page);
+  }
+
+  void undo() {
+    final page = currentPage;
+    if (page == null) return;
+    final restored = _undoManager.undo(page);
+    if (restored != null) {
+      _replaceCurrentPage(restored);
+      notifyListeners();
+    }
+  }
+
+  void redo() {
+    final page = currentPage;
+    if (page == null) return;
+    final restored = _undoManager.redo(page);
+    if (restored != null) {
+      _replaceCurrentPage(restored);
+      notifyListeners();
+    }
+  }
+
+  void _replaceCurrentPage(LayoutPage newPage) {
+    if (_currentProject == null) return;
+    _currentProject!.pages[_currentPageIndex] = newPage;
+  }
+
+  void _saveUndoSnapshot() {
+    final page = currentPage;
+    if (page != null) _undoManager.saveSnapshot(page);
+  }
 
   // ===== 照片操作 =====
 
@@ -122,6 +164,8 @@ class AppState extends ChangeNotifier {
     // 检查是否已存在
     final exists = page.elements.any((e) => e.photo.id == photo.id);
     if (exists) return;
+
+    _saveUndoSnapshot();
 
     final margin = 40.0;
     final photoW = (page.pageWidth - margin * 2) / 2;
@@ -242,6 +286,7 @@ class AppState extends ChangeNotifier {
   }
 
   void removeElement(String elementId) {
+    _saveUndoSnapshot();
     currentPage?.removeElement(elementId);
     notifyListeners();
   }
@@ -275,6 +320,7 @@ class AppState extends ChangeNotifier {
   void addTextOverlay(String text) {
     final page = currentPage;
     if (page == null) return;
+    _saveUndoSnapshot();
     page.textOverlays.add(TextOverlay(
       id: 'text_${page.textOverlays.length}_${DateTime.now().millisecondsSinceEpoch}',
       text: text,
@@ -285,6 +331,7 @@ class AppState extends ChangeNotifier {
   }
 
   void updateTextOverlay(String id, String newText) {
+    _saveUndoSnapshot();
     final overlay = currentPage?.textOverlays.firstWhere((t) => t.id == id);
     if (overlay != null) {
       overlay.text = newText;
@@ -302,6 +349,7 @@ class AppState extends ChangeNotifier {
   }
 
   void updateTextStyle(String id, {double? fontSize, int? color, bool? bold, bool? italic}) {
+    _saveUndoSnapshot();
     final overlay = currentPage?.textOverlays.firstWhere((t) => t.id == id);
     if (overlay != null) {
       if (fontSize != null) overlay.fontSize = fontSize;
@@ -329,6 +377,7 @@ class AppState extends ChangeNotifier {
   }
 
   void removeTextOverlay(String id) {
+    _saveUndoSnapshot();
     currentPage?.textOverlays.removeWhere((t) => t.id == id);
     notifyListeners();
   }
@@ -336,6 +385,7 @@ class AppState extends ChangeNotifier {
   // ===== 照片边框 =====
 
   void setElementBorder(String elementId, PhotoBorderStyle style) {
+    _saveUndoSnapshot();
     final el = currentPage?.elements.firstWhere((e) => e.id == elementId);
     if (el != null) {
       el.borderStyle = style;
@@ -376,6 +426,7 @@ class AppState extends ChangeNotifier {
   // ===== 页面装饰 =====
 
   void addDecoration(String type) {
+    _saveUndoSnapshot();
     final page = currentPage;
     if (page == null) return;
     page.decorations.add(PageDecoration(
@@ -386,11 +437,13 @@ class AppState extends ChangeNotifier {
   }
 
   void removeDecoration(String id) {
+    _saveUndoSnapshot();
     currentPage?.decorations.removeWhere((d) => d.id == id);
     notifyListeners();
   }
 
   void clearDecorations() {
+    _saveUndoSnapshot();
     currentPage?.decorations.clear();
     notifyListeners();
   }
