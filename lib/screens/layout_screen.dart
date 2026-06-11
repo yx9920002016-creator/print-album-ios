@@ -346,6 +346,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
         onScaleEnd: element.locked ? null : (_) {
           _gestureStarts.remove(element.id);
           setState(() => _snapGuides = []);
+          state.saveProject(); // 手势结束后自动保存
         },
         onTap: () => _showElementOptions(state, element),
         child: Transform.rotate(
@@ -595,7 +596,10 @@ class _LayoutScreenState extends State<LayoutScreen> {
             state.updateTextOverlayRotation(text.id, start.rotation + details.rotation * 180 / pi);
           }
         },
-        onScaleEnd: (_) => _gestureStarts.remove(text.id),
+        onScaleEnd: (_) {
+          _gestureStarts.remove(text.id);
+          state.saveProject();
+        },
         onLongPress: () => _editTextOverlay(state, text),
         child: Transform.rotate(
           angle: text.rotation * pi / 180,

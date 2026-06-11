@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:async';
 import '../models/photo_model.dart';
 import '../models/album_project.dart';
 import '../models/layout_page.dart';
@@ -88,6 +89,24 @@ class AppState extends ChangeNotifier {
   void _saveUndoSnapshot() {
     final page = currentPage;
     if (page != null) _undoManager.saveSnapshot(page);
+    _scheduleAutoSave();
+  }
+
+  // ===== 自动保存 =====
+
+  Timer? _autoSaveTimer;
+
+  void _scheduleAutoSave() {
+    _autoSaveTimer?.cancel();
+    _autoSaveTimer = Timer(const Duration(seconds: 2), () {
+      saveProject();
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoSaveTimer?.cancel();
+    super.dispose();
   }
 
   // ===== 照片操作 =====
