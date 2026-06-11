@@ -21,6 +21,7 @@ class LayoutElement {
   double rotation;      // 旋转角度（度）
   double scale;         // 缩放比例
   int zIndex;
+  bool locked;                  // 是否锁定
   PhotoBorderStyle borderStyle;  // 边框样式
   double borderWidth;            // 边框宽度
   int borderColor;               // 边框颜色
@@ -36,6 +37,7 @@ class LayoutElement {
     this.rotation = 0,
     this.scale = 1.0,
     this.zIndex = 0,
+    this.locked = false,
     this.borderStyle = PhotoBorderStyle.white,
     this.borderWidth = 8,
     this.borderColor = 0xFFFFFFFF,
@@ -52,6 +54,7 @@ class LayoutElement {
         'rotation': rotation,
         'scale': scale,
         'zIndex': zIndex,
+        'locked': locked,
         'borderStyle': borderStyle.index,
         'borderWidth': borderWidth,
         'borderColor': borderColor,
@@ -69,6 +72,7 @@ class LayoutElement {
       rotation: (json['rotation'] as num?)?.toDouble() ?? 0,
       scale: (json['scale'] as num?)?.toDouble() ?? 1.0,
       zIndex: (json['zIndex'] as num?)?.toInt() ?? 0,
+      locked: json['locked'] as bool? ?? false,
       borderStyle: PhotoBorderStyle.values[json['borderStyle'] as int? ?? 1],
       borderWidth: (json['borderWidth'] as num?)?.toDouble() ?? 8,
       borderColor: (json['borderColor'] as num?)?.toInt() ?? 0xFFFFFFFF,
@@ -239,5 +243,13 @@ class LayoutPage {
         : elements.map((e) => e.zIndex).reduce((a, b) => a > b ? a : b);
     final element = elements.firstWhere((e) => e.id == elementId);
     element.zIndex = maxZ + 1;
+  }
+
+  void sendToBack(String elementId) {
+    final minZ = elements.isEmpty
+        ? 0
+        : elements.map((e) => e.zIndex).reduce((a, b) => a < b ? a : b);
+    final element = elements.firstWhere((e) => e.id == elementId);
+    element.zIndex = minZ - 1;
   }
 }

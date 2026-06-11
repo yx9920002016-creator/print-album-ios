@@ -239,7 +239,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   child: Stack(
                     children: [
                       if (state.showGrid) _buildGrid(page),
-                      ...page.elements.map((el) => _buildDraggableElement(state, page, el)),
+                      ..._sortedElements(page, state),
                       ...page.textOverlays.map((t) => _buildTextOverlay(state, t)),
                       ...page.decorations.map((d) => _buildDecoration(page, d)),
                       // 吸附辅助线
@@ -266,6 +266,13 @@ class _LayoutScreenState extends State<LayoutScreen> {
       size: Size(page.pageWidth * 0.3, page.pageHeight * 0.3),
       painter: _GridPainter(gridSize: 40),
     );
+  }
+
+  /// 按 zIndex 排序的元素列表
+  List<Widget> _sortedElements(LayoutPage page, AppState state) {
+    final sorted = List<LayoutElement>.from(page.elements);
+    sorted.sort((a, b) => a.zIndex.compareTo(b.zIndex));
+    return sorted.map((el) => _buildDraggableElement(state, page, el)).toList();
   }
 
   // ===== 照片元素（画布坐标系，不随屏幕缩放） =====
@@ -313,14 +320,14 @@ class _LayoutScreenState extends State<LayoutScreen> {
       left: element.x * viewScale,
       top: element.y * viewScale,
       child: GestureDetector(
-        onScaleStart: (_) {
+        onScaleStart: element.locked ? null : (_) {
           _gestureStarts[element.id] = _GestureStart(
             scale: element.scale, rotation: element.rotation,
             x: element.x, y: element.y,
           );
           state.saveUndoSnapshot();
         },
-        onScaleUpdate: (details) {
+        onScaleUpdate: element.locked ? null : (details) {
           final start = _gestureStarts[element.id];
           if (start == null) return;
           final proposedX = start.x + details.focalPointDelta.dx / viewScale;
@@ -335,7 +342,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
             state.updateElementRotation(element.id, start.rotation + details.rotation * 180 / pi);
           }
         },
-        onScaleEnd: (_) {
+        onScaleEnd: element.locked ? null : (_) {
           _gestureStarts.remove(element.id);
           setState(() => _snapGuides = []);
         },
@@ -375,6 +382,19 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     ),
                   ),
                 ),
+                // 锁定图标
+                if (element.locked)
+                  Positioned(
+                    top: -6, left: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.lock_rounded, size: 10, color: Colors.white),
+                    ),
+                  ),
                 // 删除按钮（画布坐标系，保持固定大小以便点击）
                 Positioned(
                   top: -6, right: -6,
@@ -440,9 +460,52 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     ],
                   ),
                 ),
+                SizedBox(height: context.rw(20)),
+                Text('层级与操作', style: TextStyle(fontSize: context.rw(14), fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                SizedBox(height: context.rw(10)),
+                Row(
+                  children: [
+                    _actionChip(
+                      Icons.flip_to_front_rounded, '置顶',
+                      () { state.bringElementToFront(element.id); Navigator.pop(context); },
+                    ),
+                    SizedBox(width: context.rw(8)),
+                    _actionChip(
+                      Icons.flip_to_back_rounded, '置底',
+                      () { state.sendElementToBack(element.id); Navigator.pop(context); },
+                    ),
+                    SizedBox(width: context.rw(8)),
+                    _actionChip(
+                      element.locked ? Icons.lock_open_rounded : Icons.lock_outline_rounded,
+                      element.locked ? '解锁' : '锁定',
+                      () { state.toggleElementLock(element.id); Navigator.pop(context); },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _actionChip(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: context.rw(14), vertical: context.rw(8)),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF0F3),
+          borderRadius: BorderRadius.circular(context.rw(20)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: context.rw(16), color: AppTheme.primaryColor),
+            SizedBox(width: context.rw(4)),
+            Text(label, style: TextStyle(fontSize: context.rw(12), fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          ],
         ),
       ),
     );

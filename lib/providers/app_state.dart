@@ -291,6 +291,26 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void bringElementToFront(String elementId) {
+    _saveUndoSnapshot();
+    currentPage?.bringToFront(elementId);
+    notifyListeners();
+  }
+
+  void sendElementToBack(String elementId) {
+    _saveUndoSnapshot();
+    currentPage?.sendToBack(elementId);
+    notifyListeners();
+  }
+
+  void toggleElementLock(String elementId) {
+    final el = currentPage?.elements.firstWhere((e) => e.id == elementId);
+    if (el != null) {
+      el.locked = !el.locked;
+      notifyListeners();
+    }
+  }
+
   void toggleGrid() { _showGrid = !_showGrid; notifyListeners(); }
 
   void setTheme(int index) {
