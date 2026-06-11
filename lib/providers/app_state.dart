@@ -266,6 +266,21 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void duplicateCurrentPage() {
+    final project = _currentProject;
+    final page = currentPage;
+    if (project == null || page == null) return;
+    final json = page.toJson();
+    final newPage = LayoutPage.fromJson({
+      ...json,
+      'id': 'page_${project.pages.length}_${DateTime.now().millisecondsSinceEpoch}',
+    });
+    project.addPage();
+    _currentPageIndex = project.pages.length - 1;
+    _replaceCurrentPage(newPage);
+    notifyListeners();
+  }
+
   void goToPage(int index) {
     _currentProject?.goToPage(index);
     _currentPageIndex = index;

@@ -71,6 +71,27 @@ class ExportService {
     await Share.shareXFiles([file], text: '我的成长相册');
   }
 
+  /// 导出所有页面为 PNG 图片，返回文件路径列表
+  Future<List<String>?> exportAllPagesAsImages(AlbumProject project, {double scale = 2.0}) async {
+    try {
+      final paths = <String>[];
+      for (int i = 0; i < project.pages.length; i++) {
+        final path = await exportPageAsImage(project.pages[i], scale: scale);
+        if (path != null) paths.add(path);
+      }
+      return paths.isEmpty ? null : paths;
+    } catch (e) {
+      print('多页图片导出失败: $e');
+      return null;
+    }
+  }
+
+  /// 分享多张图片
+  Future<void> shareImages(List<String> paths) async {
+    final files = paths.map((p) => XFile(p)).toList();
+    await Share.shareXFiles(files, text: '我的成长相册');
+  }
+
   // ──────────────────────────────────────────────
   //  图片导出（修复版：含文字、装饰、旋转、缩放）
   // ──────────────────────────────────────────────

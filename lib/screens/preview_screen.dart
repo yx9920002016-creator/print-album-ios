@@ -76,6 +76,7 @@ class PreviewScreen extends StatelessWidget {
                 ),
                 // 导出按钮
                 _headerBtn(context, Icons.save_alt_rounded, '导出 PDF', () => _exportPdf(context, state)),
+                _headerBtn(context, Icons.image_rounded, '导出图片', () => _exportImages(context, state)),
                 _headerBtn(context, Icons.share_rounded, '分享', () => _sharePdf(context, state)),
               ],
             ),
@@ -369,6 +370,43 @@ class PreviewScreen extends StatelessWidget {
             label: '分享',
             textColor: AppTheme.accentWarm,
             onPressed: () => _sharePdfFile(context, state, path),
+          ),
+          backgroundColor: AppTheme.textPrimary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('导出失败，请重试'),
+          backgroundColor: Colors.red.shade400,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  void _exportImages(BuildContext context, AppState state) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
+    );
+
+    final paths = await state.exportService.exportAllPagesAsImages(state.currentProject!);
+    if (!context.mounted) return;
+    Navigator.pop(context);
+
+    if (paths != null && paths.isNotEmpty && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('已导出 ${paths.length} 张图片 ~'),
+          action: SnackBarAction(
+            label: '分享',
+            textColor: AppTheme.accentWarm,
+            onPressed: () => state.exportService.shareImages(paths),
           ),
           backgroundColor: AppTheme.textPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),

@@ -119,6 +119,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           _headerIcon(Icons.grid_view_rounded, '网格', state.showGrid, () => state.toggleGrid()),
           _buildThemePopup(state),
           _headerIcon(Icons.add_circle_rounded, '加页', false, () => state.addPage()),
+          _headerIcon(Icons.copy_rounded, '复制页', false, () => state.duplicateCurrentPage()),
           if (state.pageCount > 1)
             _headerIcon(Icons.delete_outline_rounded, '删页', false,
                 () => _confirmDeletePage(state)),
