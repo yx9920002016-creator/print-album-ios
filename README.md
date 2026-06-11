@@ -12,6 +12,17 @@
 - 📄 **导出 PDF**：一键生成高清 PDF，可直接打印实体相册
 - 🌐 **多平台**：支持 Web / iOS，浏览器和手机均可使用
 
+## 文件清单
+
+| 文件 | 用途 |
+|------|------|
+| `启动制作工具.bat` | 一键启动浏览器调试 |
+| `一键环境安装.bat` | 首次安装 Flutter 依赖 |
+| `上传GitHub备份.bat` | 一键提交并推送代码到 GitHub |
+| `添加web支持.bat` | 首次添加 Web 平台（仅需一次） |
+| `privacy_policy.html` | 隐私政策页面（App Store 必填） |
+| `使用说明.txt` | 快速上手说明书 |
+
 ## 快速开始
 
 ### 电脑运行（浏览器调试）
@@ -27,6 +38,10 @@
 ### 首次配置
 
 双击 `添加web支持.bat`（仅需一次）→ 双击 `一键环境安装.bat`
+
+### 备份到 GitHub
+
+双击 `上传GitHub备份.bat` → 输入修改说明 → 自动提交并推送
 
 ## 操作指南
 
@@ -54,13 +69,19 @@
 | PDF 生成 | pdf + printing |
 | 运行平台 | iOS / Web |
 
+## GitHub
+
+- **仓库地址**：https://github.com/yx9920002016-creator/print-album-ios
+- **隐私政策**：https://yx9920002016-creator.github.io/print-album-ios/privacy_policy.html
+
 ## 更新记录
 
 ### 2026-06-11
 - 正式命名为「排版印相」· PrintAlbum
 - 新增 iOS 暗色模式支持
-- 新增隐私政策页面
+- 新增隐私政策页面（已部署 GitHub Pages）
 - 优化权限描述文案（符合 App Store 审核要求）
 - 全面 UI 改造：甜美可爱风格
 - 照片/文字支持拖拽、缩放、旋转
 - 新增 Web 平台与手机局域网调试
+- GitHub 仓库创建、备份脚本
