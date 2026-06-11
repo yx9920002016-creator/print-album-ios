@@ -5,6 +5,7 @@ import 'screens/select_screen.dart';
 import 'screens/layout_screen.dart';
 import 'screens/preview_screen.dart';
 import 'theme/app_theme.dart';
+import 'utils/responsive_helper.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +58,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       body: IndexedStack(
         index: _currentTab,
@@ -68,21 +68,21 @@ class _MainScreenState extends State<MainScreen> {
           boxShadow: [
             BoxShadow(
               color: AppTheme.primaryColor.withAlpha(20),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
+              blurRadius: context.rw(16),
+              offset: Offset(0, -context.rw(4)),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(20))),
           child: BottomNavigationBar(
             currentIndex: _currentTab,
             onTap: (index) => setState(() => _currentTab = index),
             backgroundColor: AppTheme.bgCard,
             selectedItemColor: AppTheme.primaryColor,
             unselectedItemColor: AppTheme.textLight,
-            selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-            unselectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+            selectedLabelStyle: TextStyle(fontSize: context.rw(12), fontWeight: FontWeight.w700),
+            unselectedLabelStyle: TextStyle(fontSize: context.rw(11), fontWeight: FontWeight.w500),
             type: BottomNavigationBarType.fixed,
             elevation: 0,
             items: List.generate(3, (i) {
@@ -90,18 +90,18 @@ class _MainScreenState extends State<MainScreen> {
               final isSelected = _currentTab == i;
               return BottomNavigationBarItem(
                 icon: Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: EdgeInsets.all(context.rw(6)),
                   decoration: isSelected
                       ? BoxDecoration(
                           gradient: const LinearGradient(
                             colors: AppTheme.gradientPrimary,
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(context.rw(12)),
                         )
                       : null,
                   child: Icon(
                     item.icon,
-                    size: 24,
+                    size: context.rw(24),
                     color: isSelected ? Colors.white : AppTheme.textLight,
                   ),
                 ),

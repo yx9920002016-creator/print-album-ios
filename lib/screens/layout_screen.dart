@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../models/layout_page.dart';
 import '../theme/app_theme.dart';
+import '../utils/responsive_helper.dart';
 
 /// 记录手势开始时的元素状态
 class _GestureStart {
@@ -33,26 +34,26 @@ class _LayoutScreenState extends State<LayoutScreen> {
       return Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: EdgeInsets.all(context.rw(32)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(context.rw(24)),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFFFFF0F3), Color(0xFFF5F0FF)],
                     ),
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(context.rw(32)),
                   ),
-                  child: const Icon(Icons.dashboard_customize_rounded, size: 72, color: AppTheme.primaryLight),
+                  child: Icon(Icons.dashboard_customize_rounded, size: context.rw(72), color: AppTheme.primaryLight),
                 ),
-                const SizedBox(height: 20),
-                const Text('还没有排版项目',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-                const SizedBox(height: 8),
-                const Text('请先在「选片」中选择照片并创建项目',
-                    style: TextStyle(fontSize: 14, color: AppTheme.textSecondary)),
+                SizedBox(height: context.rw(20)),
+                Text('还没有排版项目',
+                    style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(8)),
+                Text('请先在「选片」中选择照片并创建项目',
+                    style: TextStyle(fontSize: context.rw(14), color: AppTheme.textSecondary)),
               ],
             ),
           ),
@@ -66,11 +67,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
           // 顶部栏
           _buildHeader(state),
           // 画布
-          Expanded(child: _buildCanvas(context, state)),
+          Expanded(child: _buildCanvas(state)),
           // 照片条
-          _buildPhotoStrip(context, state),
+          _buildPhotoStrip(state),
           // 底部工具条
-          _buildBottomBar(context, state),
+          _buildBottomBar(state),
         ],
       ),
     );
@@ -79,30 +80,30 @@ class _LayoutScreenState extends State<LayoutScreen> {
   // ===== 顶部栏 =====
   Widget _buildHeader(AppState state) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           colors: AppTheme.gradientHeader,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(context.rw(24))),
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 8,
-        left: 8,
-        right: 8,
-        bottom: 8,
+        top: MediaQuery.of(context).padding.top + context.rw(8),
+        left: context.rw(8),
+        right: context.rw(8),
+        bottom: context.rw(8),
       ),
       child: Row(
         children: [
           // 返回/标题
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: context.rw(8)),
               child: Text(
                 state.currentProject!.name,
-                style: const TextStyle(
-                  fontSize: 19,
+                style: TextStyle(
+                  fontSize: context.rw(19),
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -116,7 +117,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           _headerIcon(Icons.add_circle_rounded, '加页', false, () => state.addPage()),
           if (state.pageCount > 1)
             _headerIcon(Icons.delete_outline_rounded, '删页', false,
-                () => _confirmDeletePage(context, state)),
+                () => _confirmDeletePage(state)),
         ],
       ),
     );
@@ -128,13 +129,13 @@ class _LayoutScreenState extends State<LayoutScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          padding: const EdgeInsets.all(8),
+          margin: EdgeInsets.symmetric(horizontal: context.rw(3)),
+          padding: EdgeInsets.all(context.rw(8)),
           decoration: BoxDecoration(
             color: active ? Colors.white : Colors.white.withAlpha(30),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(context.rw(12)),
           ),
-          child: Icon(icon, size: 20, color: active ? AppTheme.primaryColor : Colors.white),
+          child: Icon(icon, size: context.rw(20), color: active ? AppTheme.primaryColor : Colors.white),
         ),
       ),
     );
@@ -142,39 +143,39 @@ class _LayoutScreenState extends State<LayoutScreen> {
 
   Widget _buildThemePopup(AppState state) {
     return PopupMenuButton<int>(
-      offset: const Offset(0, 44),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      offset: Offset(0, context.rw(44)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(16))),
       color: AppTheme.bgCard,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(context.rw(8)),
         decoration: BoxDecoration(
           color: Colors.white.withAlpha(30),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(context.rw(12)),
         ),
-        child: const Icon(Icons.palette_rounded, size: 20, color: Colors.white),
+        child: Icon(Icons.palette_rounded, size: context.rw(20), color: Colors.white),
       ),
       tooltip: '选择主题',
       onSelected: (index) => state.setTheme(index),
-      itemBuilder: (context) => List.generate(AppTheme.albumThemes.length, (index) {
+      itemBuilder: (ctx) => List.generate(AppTheme.albumThemes.length, (index) {
         final t = AppTheme.albumThemes[index];
         return PopupMenuItem(
           value: index,
-          height: 38,
+          height: context.rw(38),
           child: Row(
             children: [
               Container(
-                width: 26, height: 26,
+                width: context.rw(26), height: context.rw(26),
                 decoration: BoxDecoration(
                   color: t.bgColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(context.rw(8)),
                   border: Border.all(color: t.accentColor.withAlpha(80), width: 1.5),
                 ),
               ),
-              const SizedBox(width: 10),
-              Text(t.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+              SizedBox(width: context.rw(10)),
+              Text(t.name, style: TextStyle(fontSize: context.rw(14), fontWeight: FontWeight.w500)),
               if (index == state.currentThemeIndex) ...[
                 const Spacer(),
-                const Icon(Icons.check_circle_rounded, size: 20, color: AppTheme.primaryColor),
+                Icon(Icons.check_circle_rounded, size: context.rw(20), color: AppTheme.primaryColor),
               ],
             ],
           ),
@@ -184,7 +185,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 画布 =====
-  Widget _buildCanvas(BuildContext context, AppState state) {
+  Widget _buildCanvas(AppState state) {
     final page = state.currentPage;
     if (page == null) return const SizedBox.shrink();
 
@@ -194,8 +195,8 @@ class _LayoutScreenState extends State<LayoutScreen> {
 
     return LayoutBuilder(
       builder: (ctx, constraints) {
-        final availW = constraints.maxWidth - 40;
-        final availH = constraints.maxHeight - 40;
+        final availW = constraints.maxWidth - context.rw(40);
+        final availH = constraints.maxHeight - context.rw(40);
         final scaleX = availW / pagePixelW;
         final scaleY = availH / pagePixelH;
         final initialScale = (scaleX < scaleY ? scaleX : scaleY).clamp(0.05, 1.0);
@@ -204,13 +205,13 @@ class _LayoutScreenState extends State<LayoutScreen> {
         controller.value = Matrix4.identity()..scale(initialScale);
 
         return Padding(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(context.rw(8)),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(context.rw(20)),
             child: InteractiveViewer(
               minScale: 0.05,
               maxScale: 3.0,
-              boundaryMargin: const EdgeInsets.all(200),
+              boundaryMargin: EdgeInsets.all(context.rw(200)),
               transformationController: controller,
               child: Center(
                 child: Container(
@@ -218,20 +219,20 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   height: pagePixelH,
                   decoration: BoxDecoration(
                     color: theme.bgColor,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(context.rw(4)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withAlpha(25),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
+                        blurRadius: context.rw(20),
+                        offset: Offset(0, context.rw(4)),
                       ),
                     ],
                   ),
                   child: Stack(
                     children: [
                       if (state.showGrid) _buildGrid(page),
-                      ...page.elements.map((el) => _buildDraggableElement(context, state, el)),
-                      ...page.textOverlays.map((t) => _buildTextOverlay(context, state, t)),
+                      ...page.elements.map((el) => _buildDraggableElement(state, el)),
+                      ...page.textOverlays.map((t) => _buildTextOverlay(state, t)),
                       ...page.decorations.map((d) => _buildDecoration(page, d)),
                     ],
                   ),
@@ -251,8 +252,8 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  // ===== 照片元素 =====
-  Widget _buildDraggableElement(BuildContext context, AppState state, LayoutElement element) {
+  // ===== 照片元素（画布坐标系，不随屏幕缩放） =====
+  Widget _buildDraggableElement(AppState state, LayoutElement element) {
     final viewScale = 0.3;
     final borderW = element.borderWidth * viewScale * element.scale;
     final totalW = (element.width * viewScale + borderW * 2) * element.scale;
@@ -318,7 +319,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           }
         },
         onScaleEnd: (_) => _gestureStarts.remove(element.id),
-        onTap: () => _showElementOptions(context, state, element),
+        onTap: () => _showElementOptions(state, element),
         child: Transform.rotate(
           angle: element.rotation * pi / 180,
           child: Container(
@@ -354,7 +355,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     ),
                   ),
                 ),
-                // 删除按钮
+                // 删除按钮（画布坐标系，保持固定大小以便点击）
                 Positioned(
                   top: -6, right: -6,
                   child: GestureDetector(
@@ -380,42 +381,42 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  // ===== 照片元素选项 =====
-  void _showElementOptions(BuildContext context, AppState state, LayoutElement element) {
+  // ===== 照片元素选项弹窗 =====
+  void _showElementOptions(AppState state, LayoutElement element) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.bgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(24))),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.rw(20)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Container(
-                    width: 40, height: 4,
-                    decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(2)),
+                    width: context.rw(40), height: context.rw(4),
+                    decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(context.rw(2))),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text('照片样式', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
+                Text('照片样式', style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(16)),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _borderOption(ctx, state, element, PhotoBorderStyle.none, '无边框', Icons.crop_free_rounded),
-                      _borderOption(ctx, state, element, PhotoBorderStyle.white, '白边', Icons.crop_square_rounded),
-                      _borderOption(ctx, state, element, PhotoBorderStyle.polaroid, '拍立得', Icons.photo_rounded),
-                      _borderOption(ctx, state, element, PhotoBorderStyle.rounded, '圆角', Icons.rounded_corner_rounded),
-                      _borderOption(ctx, state, element, PhotoBorderStyle.vintage, '复古', Icons.history_rounded),
-                      _borderOption(ctx, state, element, PhotoBorderStyle.shadow, '阴影', Icons.layers_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.none, '无边框', Icons.crop_free_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.white, '白边', Icons.crop_square_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.polaroid, '拍立得', Icons.photo_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.rounded, '圆角', Icons.rounded_corner_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.vintage, '复古', Icons.history_rounded),
+                      _borderOption(state, element, PhotoBorderStyle.shadow, '阴影', Icons.layers_rounded),
                     ],
                   ),
                 ),
@@ -427,37 +428,37 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  Widget _borderOption(BuildContext ctx, AppState state, LayoutElement element,
+  Widget _borderOption(AppState state, LayoutElement element,
       PhotoBorderStyle style, String label, IconData icon) {
     final isSelected = element.borderStyle == style;
     return Padding(
-      padding: const EdgeInsets.only(right: 12),
+      padding: EdgeInsets.only(right: context.rw(12)),
       child: GestureDetector(
-        onTap: () { state.setElementBorder(element.id, style); Navigator.pop(ctx); },
+        onTap: () { state.setElementBorder(element.id, style); Navigator.pop(context); },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 60, height: 60,
+                width: context.rw(60), height: context.rw(60),
                 decoration: BoxDecoration(
                   gradient: isSelected
                       ? const LinearGradient(colors: AppTheme.gradientPrimary)
                       : null,
                   color: isSelected ? null : const Color(0xFFFFF0F3),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(context.rw(16)),
                   boxShadow: isSelected
-                      ? [BoxShadow(color: AppTheme.primaryColor.withAlpha(40), blurRadius: 8)]
+                      ? [BoxShadow(color: AppTheme.primaryColor.withAlpha(40), blurRadius: context.rw(8))]
                       : null,
                 ),
-                child: Icon(icon, size: 26,
+                child: Icon(icon, size: context.rw(26),
                     color: isSelected ? Colors.white : AppTheme.textSecondary),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: context.rw(6)),
               Text(label,
                   style: TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w600,
+                    fontSize: context.rw(12), fontWeight: FontWeight.w600,
                     color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary,
                   )),
             ],
@@ -467,8 +468,8 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  // ===== 文字覆盖层 =====
-  Widget _buildTextOverlay(BuildContext context, AppState state, TextOverlay text) {
+  // ===== 文字覆盖层（画布坐标系，不随屏幕缩放） =====
+  Widget _buildTextOverlay(AppState state, TextOverlay text) {
     final viewScale = 0.3;
     return Positioned(
       left: text.x * viewScale,
@@ -496,7 +497,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           }
         },
         onScaleEnd: (_) => _gestureStarts.remove(text.id),
-        onLongPress: () => _editTextOverlay(context, state, text),
+        onLongPress: () => _editTextOverlay(state, text),
         child: Transform.rotate(
           angle: text.rotation * pi / 180,
           child: Container(
@@ -525,7 +526,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 编辑文字对话框 =====
-  void _editTextOverlay(BuildContext context, AppState state, TextOverlay text) {
+  void _editTextOverlay(AppState state, TextOverlay text) {
     final controller = TextEditingController(text: text.text);
     showModalBottomSheet(
       context: context,
@@ -533,24 +534,24 @@ class _LayoutScreenState extends State<LayoutScreen> {
       isScrollControlled: true,
       builder: (ctx) => Container(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.bgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(24))),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.rw(20)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Container(width: 40, height: 4,
-                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(2))),
+                  child: Container(width: context.rw(40), height: context.rw(4),
+                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(context.rw(2)))),
                 ),
-                const SizedBox(height: 16),
-                const Text('编辑文字', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
+                Text('编辑文字', style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(16)),
                 TextField(
                   controller: controller,
                   decoration: const InputDecoration(
@@ -559,9 +560,9 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   ),
                   autofocus: true,
                 ),
-                const SizedBox(height: 16),
-                const Text('字号', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
+                SizedBox(height: context.rw(16)),
+                Text('字号', style: TextStyle(fontSize: context.rw(14), fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                SizedBox(height: context.rw(8)),
                 Row(
                   children: [
                     _textStyleChip(state, text, '大标题', 72),
@@ -570,9 +571,9 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     _textStyleChip(state, text, '小字', 24),
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Text('颜色', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
+                SizedBox(height: context.rw(16)),
+                Text('颜色', style: TextStyle(fontSize: context.rw(14), fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                SizedBox(height: context.rw(8)),
                 Row(
                   children: [
                     _colorChip(state, text, '深', 0xFF3D2C3A),
@@ -582,7 +583,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     _colorChip(state, text, '金', 0xFFFFD54F),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: context.rw(24)),
                 Row(
                   children: [
                     Expanded(
@@ -595,7 +596,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                         child: const Text('删除'),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: context.rw(12)),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -618,20 +619,20 @@ class _LayoutScreenState extends State<LayoutScreen> {
   Widget _textStyleChip(AppState state, TextOverlay text, String label, double size) {
     final isSelected = text.fontSize == size;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: context.rw(8)),
       child: GestureDetector(
         onTap: () => state.updateTextStyle(text.id, fontSize: size),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: context.rw(14), vertical: context.rw(8)),
           decoration: BoxDecoration(
             gradient: isSelected ? const LinearGradient(colors: AppTheme.gradientPrimary) : null,
             color: isSelected ? null : const Color(0xFFFFF0F3),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(context.rw(20)),
           ),
           child: Text(label,
               style: TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w600,
+                fontSize: context.rw(13), fontWeight: FontWeight.w600,
                 color: isSelected ? Colors.white : AppTheme.textSecondary,
               )),
         ),
@@ -642,11 +643,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
   Widget _colorChip(AppState state, TextOverlay text, String label, int color) {
     final isSelected = text.color == color;
     return Padding(
-      padding: const EdgeInsets.only(right: 10),
+      padding: EdgeInsets.only(right: context.rw(10)),
       child: GestureDetector(
         onTap: () => state.updateTextStyle(text.id, color: color),
         child: Container(
-          width: 36, height: 36,
+          width: context.rw(36), height: context.rw(36),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Color(color),
@@ -655,18 +656,18 @@ class _LayoutScreenState extends State<LayoutScreen> {
               width: 3,
             ),
             boxShadow: isSelected
-                ? [BoxShadow(color: Color(color).withAlpha(60), blurRadius: 8)]
+                ? [BoxShadow(color: Color(color).withAlpha(60), blurRadius: context.rw(8))]
                 : null,
           ),
           child: isSelected
-              ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+              ? Icon(Icons.check_rounded, size: context.rw(16), color: Colors.white)
               : null,
         ),
       ),
     );
   }
 
-  // ===== 装饰元素 =====
+  // ===== 装饰元素（画布坐标系，不随屏幕缩放） =====
   Widget _buildDecoration(LayoutPage page, PageDecoration dec) {
     final scale = 0.3;
     final size = dec.size * scale;
@@ -737,22 +738,22 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 底部工具栏 =====
-  Widget _buildBottomBar(BuildContext context, AppState state) {
+  Widget _buildBottomBar(AppState state) {
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.bgCard,
         boxShadow: [
           BoxShadow(
             color: AppTheme.primaryColor.withAlpha(12),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+            blurRadius: context.rw(12),
+            offset: Offset(0, -context.rw(2)),
           ),
         ],
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(20))),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: context.rw(8), vertical: context.rw(4)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -761,25 +762,25 @@ class _LayoutScreenState extends State<LayoutScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _toolButton(Icons.text_fields_rounded, '文字', () => _showAddTextDialog(context, state)),
-                    _toolButton(Icons.auto_awesome, '装饰', () => _showDecorationPicker(context, state)),
-                    _toolButton(Icons.palette_rounded, '背景', () => _showThemePicker(context, state)),
+                    _toolButton(Icons.text_fields_rounded, '文字', () => _showAddTextDialog(state)),
+                    _toolButton(Icons.auto_awesome, '装饰', () => _showDecorationPicker(state)),
+                    _toolButton(Icons.palette_rounded, '背景', () => _showThemePicker(state)),
                     _toolButton(state.showGrid ? Icons.grid_on_rounded : Icons.grid_off_rounded,
                         '网格', () => state.toggleGrid()),
                     _toolButton(Icons.add_rounded, '加页', () => state.addPage()),
                     if (state.pageCount > 1)
                       _toolButton(Icons.delete_outline_rounded, '删页',
-                          () => _confirmDeletePage(context, state)),
+                          () => _confirmDeletePage(state)),
                   ],
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: context.rw(6)),
               // 翻页控制
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: context.rw(12), vertical: context.rw(6)),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFF0F3),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(context.rw(20)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -787,11 +788,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     _pageNavButton(Icons.chevron_left_rounded,
                         state.currentPageIndex > 0, () => state.previousPage()),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: context.rw(16)),
                       child: Text(
                         '${state.currentPageIndex + 1} / ${state.pageCount}',
-                        style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w700,
+                        style: TextStyle(
+                          fontSize: context.rw(15), fontWeight: FontWeight.w700,
                           color: AppTheme.primaryColor,
                         ),
                       ),
@@ -810,22 +811,22 @@ class _LayoutScreenState extends State<LayoutScreen> {
 
   Widget _toolButton(IconData icon, String label, VoidCallback onTap) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.symmetric(horizontal: context.rw(5)),
       child: GestureDetector(
         onTap: onTap,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(context.rw(8)),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF0F3),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(context.rw(12)),
               ),
-              child: Icon(icon, size: 22, color: AppTheme.primaryColor),
+              child: Icon(icon, size: context.rw(22), color: AppTheme.primaryColor),
             ),
-            const SizedBox(height: 3),
-            Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+            SizedBox(height: context.rw(3)),
+            Text(label, style: TextStyle(fontSize: context.rw(11), fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
           ],
         ),
       ),
@@ -836,18 +837,18 @@ class _LayoutScreenState extends State<LayoutScreen> {
     return GestureDetector(
       onTap: enabled ? onTap : null,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(context.rw(4)),
         decoration: BoxDecoration(
           color: enabled ? AppTheme.primaryColor : AppTheme.primaryLight.withAlpha(80),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(context.rw(20)),
         ),
-        child: Icon(icon, size: 22, color: Colors.white),
+        child: Icon(icon, size: context.rw(22), color: Colors.white),
       ),
     );
   }
 
   // ===== 照片缩略图条 =====
-  Widget _buildPhotoStrip(BuildContext context, AppState state) {
+  Widget _buildPhotoStrip(AppState state) {
     final photos = state.currentProject?.projectPhotos ?? [];
     if (photos.isEmpty) return const SizedBox.shrink();
 
@@ -855,7 +856,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
     final usedIds = page?.elements.map((e) => e.photo.id).toSet() ?? {};
 
     return Container(
-      height: 76,
+      height: context.rw(76),
       decoration: BoxDecoration(
         color: AppTheme.bgLight,
         border: Border(top: BorderSide(color: AppTheme.primaryLight.withAlpha(60), width: 1)),
@@ -863,16 +864,16 @@ class _LayoutScreenState extends State<LayoutScreen> {
       child: Row(
         children: [
           Container(
-            width: 42,
+            width: context.rw(42),
             alignment: Alignment.center,
-            child: const Icon(Icons.photo_library_rounded, size: 20, color: AppTheme.primaryLight),
+            child: Icon(Icons.photo_library_rounded, size: context.rw(20), color: AppTheme.primaryLight),
           ),
           Expanded(
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: EdgeInsets.symmetric(vertical: context.rw(10), horizontal: context.rw(4)),
               itemCount: photos.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, __) => SizedBox(width: context.rw(8)),
               itemBuilder: (ctx, index) {
                 final photo = photos[index];
                 final isUsed = usedIds.contains(photo.id);
@@ -880,29 +881,29 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   onTap: () { if (!isUsed) state.addPhotoToCurrentPage(photo); },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: 56, height: 56,
+                    width: context.rw(56), height: context.rw(56),
                     decoration: BoxDecoration(
                       color: photo.mockColor ?? const Color(0xFFFFF0F3),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(context.rw(14)),
                       border: Border.all(
                         color: isUsed ? AppTheme.primaryColor : AppTheme.primaryLight.withAlpha(60),
                         width: isUsed ? 2.5 : 1,
                       ),
                       boxShadow: isUsed
-                          ? [BoxShadow(color: AppTheme.primaryColor.withAlpha(30), blurRadius: 6)]
+                          ? [BoxShadow(color: AppTheme.primaryColor.withAlpha(30), blurRadius: context.rw(6))]
                           : null,
                     ),
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(context.rw(12)),
                           child: photo.mockColor == null
                               ? Image.file(File(photo.path), fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image_rounded, size: 20),
+                                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image_rounded, size: context.rw(20)),
                                 )
                               : Center(
                                   child: Text(photo.title ?? '',
-                                      style: const TextStyle(fontSize: 8, color: Colors.white),
+                                      style: TextStyle(fontSize: context.rw(8), color: Colors.white),
                                       textAlign: TextAlign.center),
                                 ),
                         ),
@@ -915,7 +916,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                                 gradient: LinearGradient(colors: AppTheme.gradientPrimary),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check_rounded, size: 10, color: Colors.white),
+                              child: Icon(Icons.check_rounded, size: context.rw(10), color: Colors.white),
                             ),
                           ),
                       ],
@@ -930,33 +931,33 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  // ===== 背景主题选择 =====
-  void _showThemePicker(BuildContext context, AppState state) {
+  // ===== 背景主题选择弹窗 =====
+  void _showThemePicker(AppState state) {
     final themes = AppTheme.albumThemes;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.bgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(24))),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.rw(20)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Container(width: 40, height: 4,
-                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(2))),
+                  child: Container(width: context.rw(40), height: context.rw(4),
+                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(context.rw(2)))),
                 ),
-                const SizedBox(height: 16),
-                const Text('页面背景', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
+                Text('页面背景', style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(16)),
                 Wrap(
-                  spacing: 12, runSpacing: 12,
+                  spacing: context.rw(12), runSpacing: context.rw(12),
                   children: List.generate(themes.length, (index) {
                     final t = themes[index];
                     final isSelected = index == state.currentThemeIndex;
@@ -964,10 +965,10 @@ class _LayoutScreenState extends State<LayoutScreen> {
                       onTap: () { state.setTheme(index); Navigator.pop(ctx); },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        width: 80, height: 56,
+                        width: context.rw(80), height: context.rw(56),
                         decoration: BoxDecoration(
                           color: t.bgColor,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(context.rw(14)),
                           border: Border.all(
                             color: isSelected ? t.accentColor : t.accentColor.withAlpha(40),
                             width: isSelected ? 2.5 : 1,
@@ -977,11 +978,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (isSelected)
-                              const Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.primaryColor)
+                              Icon(Icons.check_circle_rounded, size: context.rw(18), color: AppTheme.primaryColor)
                             else
-                              Icon(Icons.circle_rounded, size: 8, color: t.accentColor),
-                            const SizedBox(height: 2),
-                            Text(t.name, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: t.textColor)),
+                              Icon(Icons.circle_rounded, size: context.rw(8), color: t.accentColor),
+                            SizedBox(height: context.rw(2)),
+                            Text(t.name, style: TextStyle(fontSize: context.rw(10), fontWeight: FontWeight.w600, color: t.textColor)),
                           ],
                         ),
                       ),
@@ -997,7 +998,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 添加文字对话框 =====
-  void _showAddTextDialog(BuildContext context, AppState state) {
+  void _showAddTextDialog(AppState state) {
     final controller = TextEditingController();
     showModalBottomSheet(
       context: context,
@@ -1005,24 +1006,24 @@ class _LayoutScreenState extends State<LayoutScreen> {
       isScrollControlled: true,
       builder: (ctx) => Container(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.bgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(24))),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.rw(20)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Container(width: 40, height: 4,
-                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(2))),
+                  child: Container(width: context.rw(40), height: context.rw(4),
+                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(context.rw(2)))),
                 ),
-                const SizedBox(height: 16),
-                const Text('添加文字', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
+                Text('添加文字', style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(16)),
                 TextField(
                   controller: controller,
                   decoration: const InputDecoration(
@@ -1034,7 +1035,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   maxLines: 3,
                   minLines: 1,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: context.rw(20)),
                 Row(
                   children: [
                     Expanded(
@@ -1043,7 +1044,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                         child: const Text('取消'),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: context.rw(12)),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -1065,32 +1066,32 @@ class _LayoutScreenState extends State<LayoutScreen> {
     );
   }
 
-  // ===== 装饰选择 =====
-  void _showDecorationPicker(BuildContext context, AppState state) {
+  // ===== 装饰选择弹窗 =====
+  void _showDecorationPicker(AppState state) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.bgCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(24))),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(context.rw(20)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Container(width: 40, height: 4,
-                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(2))),
+                  child: Container(width: context.rw(40), height: context.rw(4),
+                      decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(context.rw(2)))),
                 ),
-                const SizedBox(height: 16),
-                const Text('页面装饰', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
+                Text('页面装饰', style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(16)),
                 Wrap(
-                  spacing: 10, runSpacing: 10,
+                  spacing: context.rw(10), runSpacing: context.rw(10),
                   children: [
                     _decoCard('四角边框', Icons.border_style_rounded),
                     _decoCard('爱心贴纸', Icons.favorite_rounded),
@@ -1098,12 +1099,12 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     _decoCard('爪印贴纸', Icons.pets_rounded),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: context.rw(16)),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(
                     onPressed: () { state.clearDecorations(); Navigator.pop(ctx); },
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                    icon: Icon(Icons.delete_outline_rounded, size: context.rw(18)),
                     label: const Text('清除全部装饰'),
                     style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
                   ),
@@ -1143,17 +1144,17 @@ class _LayoutScreenState extends State<LayoutScreen> {
         }
       },
       child: Container(
-        width: 72, height: 72,
+        width: context.rw(72), height: context.rw(72),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF0F3),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(context.rw(16)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 28, color: AppTheme.primaryColor),
-            const SizedBox(height: 4),
-            Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+            Icon(icon, size: context.rw(28), color: AppTheme.primaryColor),
+            SizedBox(height: context.rw(4)),
+            Text(label, style: TextStyle(fontSize: context.rw(10), fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
           ],
         ),
       ),
@@ -1161,24 +1162,24 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 通用弹窗 =====
-  void _confirmDeletePage(BuildContext context, AppState state) {
+  void _confirmDeletePage(AppState state) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.bgCard,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(24))),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(context.rw(8)),
               decoration: BoxDecoration(
                 color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(context.rw(12)),
               ),
-              child: Icon(Icons.warning_amber_rounded, color: Colors.red.shade400, size: 24),
+              child: Icon(Icons.warning_amber_rounded, color: Colors.red.shade400, size: context.rw(24)),
             ),
-            const SizedBox(width: 12),
-            const Text('删除当前页', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            SizedBox(width: context.rw(12)),
+            Text('删除当前页', style: TextStyle(fontSize: context.rw(18), fontWeight: FontWeight.w700)),
           ],
         ),
         content: const Text('确定要删除这一页吗？此操作不可撤销哦~',

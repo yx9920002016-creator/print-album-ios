@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../models/layout_page.dart';
 import '../theme/app_theme.dart';
+import '../utils/responsive_helper.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({super.key});
@@ -16,26 +17,26 @@ class PreviewScreen extends StatelessWidget {
       return Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: EdgeInsets.all(context.rw(32)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(context.rw(24)),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFFFFF0F3), Color(0xFFF5F0FF)],
                     ),
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(context.rw(32)),
                   ),
-                  child: const Icon(Icons.preview_rounded, size: 72, color: AppTheme.primaryLight),
+                  child: Icon(Icons.preview_rounded, size: context.rw(72), color: AppTheme.primaryLight),
                 ),
-                const SizedBox(height: 20),
-                const Text('还没有排版项目',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-                const SizedBox(height: 8),
-                const Text('请先创建排版项目再来预览吧',
-                    style: TextStyle(fontSize: 14, color: AppTheme.textSecondary)),
+                SizedBox(height: context.rw(20)),
+                Text('还没有排版项目',
+                    style: TextStyle(fontSize: context.rw(20), fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                SizedBox(height: context.rw(8)),
+                Text('请先创建排版项目再来预览吧',
+                    style: TextStyle(fontSize: context.rw(14), color: AppTheme.textSecondary)),
               ],
             ),
           ),
@@ -50,32 +51,32 @@ class PreviewScreen extends StatelessWidget {
         children: [
           // 顶部渐变头
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
                 colors: AppTheme.gradientHeader,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(context.rw(24))),
             ),
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 8,
-              left: 16,
-              right: 8,
-              bottom: 12,
+              top: MediaQuery.of(context).padding.top + context.rw(8),
+              left: context.rw(16),
+              right: context.rw(8),
+              bottom: context.rw(12),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     state.currentProject!.name,
-                    style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: Colors.white),
+                    style: TextStyle(fontSize: context.rw(19), fontWeight: FontWeight.w700, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 // 导出按钮
-                _headerBtn(Icons.save_alt_rounded, '导出 PDF', () => _exportPdf(context, state)),
-                _headerBtn(Icons.share_rounded, '分享', () => _sharePdf(context, state)),
+                _headerBtn(context, Icons.save_alt_rounded, '导出 PDF', () => _exportPdf(context, state)),
+                _headerBtn(context, Icons.share_rounded, '分享', () => _sharePdf(context, state)),
               ],
             ),
           ),
@@ -88,19 +89,19 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _headerBtn(IconData icon, String tooltip, VoidCallback onTap) {
+  Widget _headerBtn(BuildContext context, IconData icon, String tooltip, VoidCallback onTap) {
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          padding: const EdgeInsets.all(10),
+          margin: EdgeInsets.symmetric(horizontal: context.rw(3)),
+          padding: EdgeInsets.all(context.rw(10)),
           decoration: BoxDecoration(
             color: Colors.white.withAlpha(30),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(context.rw(14)),
           ),
-          child: Icon(icon, size: 22, color: Colors.white),
+          child: Icon(icon, size: context.rw(22), color: Colors.white),
         ),
       ),
     );
@@ -111,7 +112,7 @@ class PreviewScreen extends StatelessWidget {
     final page = project.pages[state.currentPageIndex];
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.rw(16)),
       child: Center(
         child: LayoutBuilder(
           builder: (ctx, constraints) {
@@ -127,18 +128,18 @@ class PreviewScreen extends StatelessWidget {
                 height: displayH,
                 decoration: BoxDecoration(
                   color: theme.bgColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(context.rw(8)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withAlpha(30),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      blurRadius: context.rw(16),
+                      offset: Offset(0, context.rw(6)),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: _renderPage(page, scaleFactor),
+                  borderRadius: BorderRadius.circular(context.rw(8)),
+                  child: _renderPage(page, scaleFactor, context),
                 ),
               ),
             );
@@ -148,7 +149,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _renderPage(LayoutPage page, double scaleFactor) {
+  Widget _renderPage(LayoutPage page, double scaleFactor, BuildContext context) {
     return Stack(
       children: [
         // 背景
@@ -173,7 +174,7 @@ class PreviewScreen extends StatelessWidget {
                       : null,
                   borderRadius: BorderRadius.circular(el.cornerRadius * scaleFactor * el.scale),
                   boxShadow: el.borderStyle == PhotoBorderStyle.shadow || el.borderStyle == PhotoBorderStyle.polaroid
-                      ? [BoxShadow(color: Colors.black.withAlpha(40), blurRadius: 8, offset: const Offset(0, 4))]
+                      ? [BoxShadow(color: Colors.black.withAlpha(40), blurRadius: context.rw(8), offset: Offset(0, context.rw(4)))]
                       : null,
                 ),
                 child: Padding(
@@ -185,8 +186,8 @@ class PreviewScreen extends StatelessWidget {
                             color: el.photo.mockColor,
                             child: Center(
                               child: Text(el.photo.title ?? '',
-                                  style: const TextStyle(color: Colors.white, fontSize: 12,
-                                      shadows: [Shadow(color: Colors.black54, blurRadius: 2)])),
+                                  style: TextStyle(color: Colors.white, fontSize: context.rw(12),
+                                      shadows: const [Shadow(color: Colors.black54, blurRadius: 2)])),
                             ),
                           )
                         : Image.file(
@@ -223,7 +224,7 @@ class PreviewScreen extends StatelessWidget {
             ),
           );
         }),
-        // 装饰元素
+        // 装饰元素（使用 canvas/page 坐标系，不随屏幕缩放）
         ...page.decorations.map((d) {
           final size = d.size * scaleFactor;
           switch (d.type) {
@@ -262,6 +263,7 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
+  /// 角装饰 - 使用页面坐标系，不随屏幕缩放
   Widget _cornerDecoration(int color, bool left, bool top) {
     return Container(
       width: 40, height: 40,
@@ -283,29 +285,30 @@ class PreviewScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.bgCard,
         boxShadow: [
-          BoxShadow(color: AppTheme.primaryColor.withAlpha(12), blurRadius: 12, offset: const Offset(0, -2)),
+          BoxShadow(color: AppTheme.primaryColor.withAlpha(12), blurRadius: context.rw(12), offset: Offset(0, -context.rw(2))),
         ],
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(context.rw(20))),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: context.rw(8)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _pageNavBtn(Icons.chevron_left_rounded,
+              _pageNavBtn(context, Icons.chevron_left_rounded,
                   state.currentPageIndex > 0, () => state.previousPage()),
-              const SizedBox(width: 16),
+              SizedBox(width: context.rw(16)),
               // 圆点指示器
               Row(
                 children: List.generate(project.pageCount, (i) {
                   final isCurrent = i == state.currentPageIndex;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
-                    width: isCurrent ? 28 : 8, height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: isCurrent ? context.rw(28) : context.rw(8),
+                    height: context.rw(8),
+                    margin: EdgeInsets.symmetric(horizontal: context.rw(3)),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(context.rw(4)),
                       gradient: isCurrent
                           ? const LinearGradient(colors: AppTheme.gradientPrimary)
                           : null,
@@ -314,13 +317,13 @@ class PreviewScreen extends StatelessWidget {
                   );
                 }),
               ),
-              const SizedBox(width: 16),
-              _pageNavBtn(Icons.chevron_right_rounded,
+              SizedBox(width: context.rw(16)),
+              _pageNavBtn(context, Icons.chevron_right_rounded,
                   state.currentPageIndex < project.pageCount - 1, () => state.nextPage()),
-              const SizedBox(width: 20),
+              SizedBox(width: context.rw(20)),
               Text('${state.currentPageIndex + 1}/${project.pageCount}',
-                  style: const TextStyle(
-                    fontSize: 14, fontWeight: FontWeight.w700,
+                  style: TextStyle(
+                    fontSize: context.rw(14), fontWeight: FontWeight.w700,
                     color: AppTheme.primaryColor,
                   )),
             ],
@@ -330,17 +333,17 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _pageNavBtn(IconData icon, bool enabled, VoidCallback onTap) {
+  Widget _pageNavBtn(BuildContext context, IconData icon, bool enabled, VoidCallback onTap) {
     return GestureDetector(
       onTap: enabled ? onTap : null,
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(context.rw(6)),
         decoration: BoxDecoration(
           gradient: enabled ? const LinearGradient(colors: AppTheme.gradientPrimary) : null,
           color: enabled ? null : const Color(0xFFFFF0F3),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(context.rw(14)),
         ),
-        child: Icon(icon, size: 22,
+        child: Icon(icon, size: context.rw(22),
             color: enabled ? Colors.white : AppTheme.primaryLight.withAlpha(80)),
       ),
     );
@@ -355,6 +358,7 @@ class PreviewScreen extends StatelessWidget {
     );
 
     final path = await state.exportService.exportToPdf(state.currentProject!);
+    if (!context.mounted) return;
     Navigator.pop(context);
 
     if (path != null && context.mounted) {
@@ -367,7 +371,7 @@ class PreviewScreen extends StatelessWidget {
             onPressed: () => _sharePdfFile(context, state, path),
           ),
           backgroundColor: AppTheme.textPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -376,7 +380,7 @@ class PreviewScreen extends StatelessWidget {
         SnackBar(
           content: const Text('导出失败，请重试'),
           backgroundColor: Colors.red.shade400,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -391,6 +395,7 @@ class PreviewScreen extends StatelessWidget {
     );
 
     final path = await state.exportService.exportToPdf(state.currentProject!);
+    if (!context.mounted) return;
     Navigator.pop(context);
 
     if (path != null) {
@@ -400,7 +405,7 @@ class PreviewScreen extends StatelessWidget {
         SnackBar(
           content: const Text('导出失败，请重试'),
           backgroundColor: Colors.red.shade400,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.rw(14))),
           behavior: SnackBarBehavior.floating,
         ),
       );
