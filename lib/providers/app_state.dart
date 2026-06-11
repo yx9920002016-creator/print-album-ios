@@ -311,6 +311,54 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  // ===== 复制/粘贴 =====
+
+  LayoutElement? _copiedElement;
+
+  void copyElement(String elementId) {
+    final el = currentPage?.elements.firstWhere((e) => e.id == elementId);
+    if (el != null) {
+      _copiedElement = LayoutElement(
+        id: '',
+        photo: el.photo,
+        width: el.width,
+        height: el.height,
+        x: el.x + 40,
+        y: el.y + 40,
+        rotation: el.rotation,
+        scale: el.scale,
+        borderStyle: el.borderStyle,
+        borderWidth: el.borderWidth,
+        borderColor: el.borderColor,
+        cornerRadius: el.cornerRadius,
+      );
+    }
+  }
+
+  void pasteElement() {
+    if (_copiedElement == null) return;
+    final page = currentPage;
+    if (page == null) return;
+    _saveUndoSnapshot();
+    // 确保 id 唯一
+    final newElement = LayoutElement(
+      id: 'elem_${page.elements.length}_${DateTime.now().millisecondsSinceEpoch}',
+      photo: _copiedElement!.photo,
+      width: _copiedElement!.width,
+      height: _copiedElement!.height,
+      x: _copiedElement!.x,
+      y: _copiedElement!.y,
+      rotation: _copiedElement!.rotation,
+      scale: _copiedElement!.scale,
+      borderStyle: _copiedElement!.borderStyle,
+      borderWidth: _copiedElement!.borderWidth,
+      borderColor: _copiedElement!.borderColor,
+      cornerRadius: _copiedElement!.cornerRadius,
+    );
+    page.addElement(newElement);
+    notifyListeners();
+  }
+
   void toggleGrid() { _showGrid = !_showGrid; notifyListeners(); }
 
   void setTheme(int index) {

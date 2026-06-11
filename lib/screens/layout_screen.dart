@@ -482,6 +482,20 @@ class _LayoutScreenState extends State<LayoutScreen> {
                     ),
                   ],
                 ),
+                SizedBox(height: context.rw(10)),
+                Row(
+                  children: [
+                    _actionChip(
+                      Icons.copy_rounded, '复制',
+                      () { state.copyElement(element.id); Navigator.pop(context); },
+                    ),
+                    SizedBox(width: context.rw(8)),
+                    _actionChip(
+                      Icons.paste_rounded, '粘贴',
+                      () { state.pasteElement(); Navigator.pop(context); },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
