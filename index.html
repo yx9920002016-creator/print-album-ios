@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排版印相 · PrintAlbum</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #FFF5F5, #FFF0F3);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; color: #3D2C3A;
+        }
+        .card {
+            background: #fff; border-radius: 24px; padding: 48px; max-width: 480px;
+            box-shadow: 0 8px 40px rgba(255, 126, 179, 0.2); text-align: center;
+        }
+        h1 { font-size: 32px; color: #FF5C8A; margin-bottom: 8px; }
+        .tagline { color: #8E7F8A; font-size: 16px; margin-bottom: 32px; }
+        .link {
+            display: block; padding: 14px 24px; margin: 12px auto;
+            background: linear-gradient(135deg, #FF7EB3, #FF5C8A);
+            color: #fff; text-decoration: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; max-width: 280px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 92, 138, 0.4); }
+        .link.secondary {
+            background: #fff; color: #FF5C8A; border: 2px solid #FFD4E0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📸 排版印相</h1>
+        <p class="tagline">照片排版 · 实体相册 · 纯本地处理</p>
+        <a class="link" href="privacy_policy.html">🔏 隐私政策</a>
+        <a class="link secondary" href="https://github.com/yx9920002016-creator/print-album-ios">💻 GitHub</a>
+    </div>
+</body>
+</html>
