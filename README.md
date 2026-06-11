@@ -40,7 +40,7 @@
 
 ## App Store 上架信息
 
-- **隐私政策**：见 `privacy_policy.html`（所有数据仅存储在设备本地，不上传服务器）
+- **隐私政策**：https://yx9920002016-creator.github.io/print-album-ios/privacy_policy.html（所有数据仅存储在设备本地，不上传服务器）
 - **暗色模式**：支持 iOS 系统深色模式
 - **权限说明**：仅需要照片库访问权限
 

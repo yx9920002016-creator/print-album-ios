@@ -33,7 +33,7 @@
 
   所有照片和项目数据仅存储在您的设备本地，
   不会上传到任何服务器。
-  详情见 privacy_policy.html
+  隐私政策: https://yx9920002016-creator.github.io/print-album-ios/privacy_policy.html
 
 ═══════════════════════════════════════════
   终端快捷键
