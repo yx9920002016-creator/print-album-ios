@@ -6,6 +6,7 @@ import '../providers/app_state.dart';
 import '../models/layout_page.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
+import '../services/snap_calculator.dart';
 
 /// 记录手势开始时的元素状态
 class _GestureStart {
@@ -25,6 +26,7 @@ class LayoutScreen extends StatefulWidget {
 
 class _LayoutScreenState extends State<LayoutScreen> {
   final Map<String, _GestureStart> _gestureStarts = {};
+  List<SnapGuide> _snapGuides = [];
 
   @override
   Widget build(BuildContext context) {
@@ -237,9 +239,17 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   child: Stack(
                     children: [
                       if (state.showGrid) _buildGrid(page),
-                      ...page.elements.map((el) => _buildDraggableElement(state, el)),
+                      ...page.elements.map((el) => _buildDraggableElement(state, page, el)),
                       ...page.textOverlays.map((t) => _buildTextOverlay(state, t)),
                       ...page.decorations.map((d) => _buildDecoration(page, d)),
+                      // 吸附辅助线
+                      if (_snapGuides.isNotEmpty)
+                        IgnorePointer(
+                          child: CustomPaint(
+                            size: Size(pagePixelW, pagePixelH),
+                            painter: SnapGuidePainter(guides: _snapGuides, viewScale: 0.3),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -259,7 +269,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
   }
 
   // ===== 照片元素（画布坐标系，不随屏幕缩放） =====
-  Widget _buildDraggableElement(AppState state, LayoutElement element) {
+  Widget _buildDraggableElement(AppState state, LayoutPage page, LayoutElement element) {
     final viewScale = 0.3;
     final borderW = element.borderWidth * viewScale * element.scale;
     final totalW = (element.width * viewScale + borderW * 2) * element.scale;
@@ -313,11 +323,11 @@ class _LayoutScreenState extends State<LayoutScreen> {
         onScaleUpdate: (details) {
           final start = _gestureStarts[element.id];
           if (start == null) return;
-          state.updateElementPosition(
-            element.id,
-            start.x + details.focalPointDelta.dx / viewScale,
-            start.y + details.focalPointDelta.dy / viewScale,
-          );
+          final proposedX = start.x + details.focalPointDelta.dx / viewScale;
+          final proposedY = start.y + details.focalPointDelta.dy / viewScale;
+          final snapResult = SnapCalculator.snap(page, element, proposedX, proposedY);
+          state.updateElementPosition(element.id, snapResult.x, snapResult.y);
+          setState(() => _snapGuides = snapResult.guides);
           if (details.scale != 1.0) {
             state.updateElementScale(element.id, start.scale * details.scale);
           }
@@ -325,7 +335,10 @@ class _LayoutScreenState extends State<LayoutScreen> {
             state.updateElementRotation(element.id, start.rotation + details.rotation * 180 / pi);
           }
         },
-        onScaleEnd: (_) => _gestureStarts.remove(element.id),
+        onScaleEnd: (_) {
+          _gestureStarts.remove(element.id);
+          setState(() => _snapGuides = []);
+        },
         onTap: () => _showElementOptions(state, element),
         child: Transform.rotate(
           angle: element.rotation * pi / 180,
